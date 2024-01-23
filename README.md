@@ -15,15 +15,11 @@ To install this repository, follow these steps:
 
 1. Clone the repository to your local machine using the HTTPS link:
    ```bash
-   git clone https://github.com/user_name/Flexible-Heatpump.git
+   git clone https://github.com/Project-GO-e/hp-flex-metric.git
 2. Navigate to the project directory
-3. Install all requirements inside an **aconda** environment:
+3. Install all requirements inside a virtual environment:
    ```bash
    pip install -r requirements.txt
-4. Make sure you have a recent version of Microsoft Visual C++ installed
-5. Install the open-source optimization solver glpk using:
-   ```bash
-   conda install -c conda-forge glpk
 ## Using the tool
 The only way to interact with the tool is via the main.py file. Please do not change any other hardcoded values in the repository. These parameters were also used for the baseline operation of the heat pumps, so changing them will give you results that do not make sense. In the main file the user can enter the following parameters to calculate a set of profiles under flexible operation of a heat pump system:
 Physical attributes:
