@@ -131,8 +131,26 @@ class FlexOptimizer:
         model.cnstr_T_dhw_tank_max = pyo.Constraint(model.time_index, rule=lambda m, t: m.T_dhw_tank[t] <= m.T_dhw_tank_max)
         model.cnstr_T_dhw_tank_hor = pyo.Constraint(rule=lambda m: m.T_dhw_tank[model.time_index_T.last()] >= m.T_dhw_tank_hor)
 
-        model.cnstr_T_in_min = pyo.Constraint(model.time_index, rule=lambda m, t: m.T_in[t] >= m.T_in_min - m.T_in_slack[t])
-        model.cnstr_T_in_hor = pyo.Constraint(rule=lambda m: m.T_in[model.time_index_T.last()] >= m.T_in_hor)
+        def constraint_min_T_in(m, t):
+            start_cong = self.start_congestion
+            end_cong = self.end_congestion
+            discomfort_duration_wrt_cong = 4
+            if (t > (start_cong - discomfort_duration_wrt_cong)) and (t < (end_cong + discomfort_duration_wrt_cong)):
+                return m.T_in[t] >= m.T_in_min - m.T_in_slack[t]
+            else:
+                return pyo.Constraint.Skip
+
+        def constraint_hor_T_in(m, t):
+            start_cong = self.start_congestion
+            end_cong = self.end_congestion
+            discomfort_duration_wrt_cong = 4
+            if (t <= (start_cong - discomfort_duration_wrt_cong)) or (t >= (end_cong + discomfort_duration_wrt_cong)):
+                return m.T_in[t] >= m.T_in_hor - m.T_in_slack[t]
+            else:
+                return pyo.Constraint.Skip
+
+        model.cnstr_T_in_min = pyo.Constraint(model.time_index, rule=constraint_min_T_in)
+        model.cnstr_T_in_hor = pyo.Constraint(model.time_index, rule=constraint_hor_T_in)
         # Check if the T_in exceeds the bound due to natural heating already. if not, add the upper bound constraint
         too_hot_in_house = self.check_too_hot_in_house(weather_profiles, solar_gain, start_states, time_step, model.T_in_max)
         if not too_hot_in_house:
@@ -199,10 +217,10 @@ class FlexOptimizer:
 
             # our index goes from 0, ..., N
             # if the end congestion is at point 3, we want all t = 0, 1, 2 in the OF
-            congestion_term = sum(m.E_hp[t] + 0.01 * m.E_max_cong for t in m.time_index if
-                                  (t >= start_cong) and (t < end_cong))
-            window_term = sum(m.E_hp[t] + 0.01 * m.E_max for t in m.time_index)
-            slack_term = sum(1.0e8 * m.T_in_slack[t] for t in m.time_index)
+            congestion_term = sum(m.E_hp[t] for t in m.time_index if (t >= start_cong) and (t < end_cong))
+            congestion_term += m.E_max
+            window_term = m.E_max
+            slack_term = sum(1.0e8 * m.T_in_slack[t] for t in m.time_index)  # For numerical stability
             return congestion_term + 0.01 * window_term + slack_term
 
         model.OF = pyo.Objective(expr=cost_function, sense=pyo.minimize)
