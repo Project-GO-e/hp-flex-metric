@@ -43,7 +43,7 @@ To generate the flex profiles for a set of physical attributes, there should alw
 - house, tank temperatures under baseline operation (example is: states+2_1kap+2012+one_person.pickle)
 - set temperatures under baseline operation (example is: temps+2_1kap+2012+one_person.pickle)
 
-These files are pre-calculated and stored in the GO-e sharepoint.
+These files are pre-calculated and stored in the GO-e sharepoint in the "HP profielen" and "HP temperaturen" folder in de folder: https://dnv.sharepoint.com/teams/GO-e/Shared%20Documents/Forms/AllItems.aspx?id=%2Fteams%2FGO%2De%2FShared%20Documents%2FWP%204%2FWerkdocumenten&viewid=e22f804b%2D21a2%2D42f8%2Db0e4%2D04975d8fbe18.
 
 ## Project Outline
 ### Code
